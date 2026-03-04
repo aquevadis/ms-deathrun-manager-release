@@ -56,5 +56,13 @@ public interface ILivesSystem
     /// </returns>
     bool Respawn(bool useLife = true);
 
+    /// <summary>
+    /// Generates an HTML string representation of the player's current lives counter.
+    /// The format and visibility of the string depend on configurable settings defined in the lives system manager.
+    /// </summary>
+    /// <returns>
+    /// An HTML-formatted string displaying the player's extra lives count,
+    /// or an empty string if the lives counter is not configured to be displayed.
+    /// </returns>
     string GetLivesCounterHtmlString();
 }
