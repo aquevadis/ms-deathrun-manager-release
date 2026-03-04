@@ -1,2 +1,1 @@
-# ms-deathrun-manager-release
-CS2 Deathrun Manager plugin port(1.6 version) for ModSharp
+## CS2 Deathrun Manager for ModSharp
