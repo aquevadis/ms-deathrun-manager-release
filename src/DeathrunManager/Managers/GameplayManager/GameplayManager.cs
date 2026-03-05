@@ -39,7 +39,9 @@ internal class GameplayManager(
     
     // ReSharper disable once MemberCanBePrivate.Global
     public static IGameRules GameRules = null!;
-    public static DeathrunGameModeVarsConfig GameVarsConfig = null!;
+    
+    // ReSharper disable once InconsistentNaming
+    private static DeathrunGameModeVarsConfig GameVarsConfig = null!;
     
     private IConVar? _autoBunnyHopCvar  = null;
     
@@ -137,24 +139,10 @@ internal class GameplayManager(
     #region Listeners
     
     //Game Listeners
-    
     public void OnGameInit() => GameRules = DeathrunManager.Bridge.ModSharp.GetGameRules();
-
-    /// <summary>
-    /// Activates the gameplay settings and configurations for the deathrun game mode.
-    /// This method executes server commands to adjust gameplay rules, including team limits, default weapons, bot behaviors,
-    /// movement acceleration, and other gameplay-related configurations. It also applies additional settings
-    /// such as removing money from the game, adjusting round time, and enabling semi-clipping through teammates based on the configuration.
-    /// </summary>
-    public void OnGameActivate()
-    {
-        logger.LogInformation("[Deathrun][GameplayManager] {colorMessage}", "Execute game mode cvars and settings!");
-        
-        sharedSystem.GetModSharp().PushTimer(ExecGameVars, 5f);
-    }
+    public void OnGameActivate() => sharedSystem.GetModSharp().PushTimer(ExecGameVars, 5f);
     
     //Client Listeners
-    
     public void OnClientDisconnected(IGameClient client, NetworkDisconnectionReason reason)
     {
         if (client?.IsValid is not true) return;
@@ -169,7 +157,6 @@ internal class GameplayManager(
     }
     
     //Entity Listeners
-    
     public void OnEntitySpawned(IBaseEntity entity)
     {
         if (entity.IsValidEntity is not true) return;
@@ -397,8 +384,10 @@ internal class GameplayManager(
     }
     public static void ReloadGameVarsConfig() { LoadGameVarsConfig(); }
 
-    private static void ExecGameVars()
+    private void ExecGameVars()
     {
+        logger.LogInformation("[Deathrun][GameplayManager] {colorMessage}", "Start executing game mode cvars!");
+
         ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.Teams, 6));
         ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.Movement, 6));
         
