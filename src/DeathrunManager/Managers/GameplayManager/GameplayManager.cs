@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
 using DeathrunManager.Config;
 using DeathrunManager.Interfaces.Managers.GameplayManager;
 using DeathrunManager.Interfaces.Managers.Native;
@@ -35,6 +39,7 @@ internal class GameplayManager(
     
     // ReSharper disable once MemberCanBePrivate.Global
     public static IGameRules GameRules = null!;
+    public static DeathrunGameModeVarsConfig GameVarsConfig = null!;
     
     private IConVar? _autoBunnyHopCvar  = null;
     
@@ -42,6 +47,8 @@ internal class GameplayManager(
     
     public bool Init()
     {
+        LoadGameVarsConfig();
+        
         Instance = this;
 
         if (DeathrunManagerConfig.Config.EnableAutoBunnyHopping is true)
@@ -143,147 +150,7 @@ internal class GameplayManager(
     {
         logger.LogInformation("[Deathrun][GameplayManager] {colorMessage}", "Execute game mode cvars and settings!");
         
-        sharedSystem.GetModSharp().PushTimer(() =>
-        {
-            //execute cvars crucial for running the deathrun game mode 1/2
-            sharedSystem.GetModSharp().ServerCommand
-            (
-                // "ms_block_valve_log 1;"// + 
-                "mp_limitteams 0;"
-                + "mp_autoteambalance false;"
-                + "bot_join_team ct;"
-                + "mp_ct_default_melee weapon_knife;"
-                + $"mp_ct_default_secondary weapon_usp_silencer;"
-                + $"mp_ct_default_primary ;"
-            );
-            //execute cvars crucial for running the deathrun game mode 2/2
-            sharedSystem.GetModSharp().ServerCommand 
-            (     
-                  "mp_t_default_melee weapon_knife;"
-                  + $"mp_t_default_secondary\" \";"
-                  + $"mp_t_default_primary\" \";"
-                  + "bot_quota_mode fill;"
-                  + "sv_enablebunnyhopping 1;"
-                  + "sv_airaccelerate 99999"
-            );
-
-            //remove money from the game and hud
-            if (DeathrunManagerConfig.Config.RemoveMoneyFromGameAndHud is true)
-            {
-                //remove money from the game and hud 1/5
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "cash_player_bomb_defused 0;"
-                        + "cash_player_bomb_planted 0;"
-                        + "cash_player_damage_hostage -30;"
-                        + "cash_player_interact_with_hostage 0;"
-                        + "cash_player_killed_enemy_default 0;"
-                        + "cash_team_win_by_time_running_out_bomb 0;"
-                    );
-                //remove money from the game and hud 2/5
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "cash_player_killed_enemy_factor 0;"
-                        + "cash_player_killed_hostage -1000;"
-                        + "cash_player_killed_teammate -300;"
-                        + "cash_player_rescued_hostage 0;"
-                        + "cash_team_elimination_bomb_map 0;"
-                        + "cash_team_elimination_hostage_map_t 0;"
-                    );
-                //remove money from the game and hud 3/5
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "cash_team_elimination_hostage_map_ct 0;"
-                        + "cash_team_hostage_alive 0;"
-                        + "cash_team_hostage_interaction 0;"
-                        + "cash_team_loser_bonus 0;"
-                        + "cash_team_bonus_shorthanded 0;"
-                        + "cash_team_loser_bonus_consecutive_rounds 0;"
-                    );
-                //remove money from the game and hud 4/5
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "cash_team_planted_bomb_but_defused 0;"
-                        + "cash_team_rescued_hostage 0;"
-                        + "cash_team_terrorist_win_bomb 0;"
-                        + "cash_team_win_by_defusing_bomb 0;"
-                        + "cash_team_win_by_hostage_rescue 0;"
-                        + "cash_team_win_by_time_running_out_hostage 0;"
-                    );
-                //remove money from the game and hud 5/5
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                         "mp_playercashawards 0;"
-                         + "mp_teamcashawards 0;"
-                         + "mp_startmoney 0;"
-                         + "mp_maxmoney 0;"
-                         + "mp_afterroundmoney 0;"
-                         + "mp_autokick 0;"
-                    );
-                
-                //speed/acceleration related cvars 1/3
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "sv_maxspeed 9999;"
-                        + "sv_alltalk 0;"
-                        + "sv_stopspeed 0;"
-                        + "sv_backspeed 0.1;"
-                        + "sv_accelerate 10;"
-                        + "sv_wateraccelerate 10;"
-                        + "sv_accelerate_use_weapon_speed 0;"
-                    );
-                //speed/acceleration related cvars 2/3
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "sv_maxspeed 9999;"
-                        + "sv_alltalk 0;"
-                        + "sv_stopspeed 0;"
-                        + "sv_backspeed 0.1;"
-                        + "sv_accelerate 10;"
-                        + "sv_wateraccelerate 10;"
-                        + "sv_staminamax 0;"
-                    );
-                //speed/acceleration related cvars 3/3
-                sharedSystem.GetModSharp()
-                    .ServerCommand
-                    (
-                        "sv_maxvelocity 9000;"
-                        + "sv_staminajumpcost 0;"
-                        + "sv_staminalandcost 0;"
-                        + "sv_staminarecoveryrate 0;"
-                        // + ";"
-                        // + ";"
-                        // + ";"
-                    );
-            }
-            
-            //adjust round time to 1 hour
-            if (DeathrunManagerConfig.Config.SetRoundTimeOneHour is true)
-            {
-                sharedSystem.GetModSharp().ServerCommand
-                (
-                    "mp_roundtime 60;"
-                    + "mp_roundtime_defuse 60;"
-                    + "mp_roundtime_hostage 60;"
-                );
-            }
-
-            //set semi-clipping to true for teammates if enabled in config
-            if (DeathrunManagerConfig.Config.EnableClippingThroughTeamMates is true)
-            {
-                sharedSystem.GetModSharp().ServerCommand
-                (
-                    "mp_solid_teammates 2;"
-                );
-            }
-        }, 5f);
+        sharedSystem.GetModSharp().PushTimer(ExecGameVars, 5f);
     }
     
     //Client Listeners
@@ -429,6 +296,154 @@ internal class GameplayManager(
 
     #endregion
     
+    #region GameVars
+
+    private static void LoadGameVarsConfig()
+    {
+        if (!Directory.Exists(DeathrunManager.ModulePath + "/configs")) 
+            Directory.CreateDirectory(DeathrunManager.ModulePath + "/configs");
+        
+        var configPath = Path.Combine(DeathrunManager.ModulePath, "configs/game_cvars.json");
+        if (!File.Exists(configPath)) CreateGameVarsConfig(configPath);
+
+        var config = JsonSerializer.Deserialize<DeathrunGameModeVarsConfig>(File.ReadAllText(configPath))!;
+        
+        DeathrunManager.Logger.LogInformation("[DeathrunManager] {colorMessage}", "Load DeathrunManager Config!");
+        GameVarsConfig = config;
+    }
+
+    private static void CreateGameVarsConfig(string configPath)
+    {
+        var config = new DeathrunGameModeVarsConfig
+        {
+            Cash = new List<string> 
+            {
+                //disable cash
+                "cash_player_bomb_defused 0",
+                "cash_player_bomb_planted 0",
+                "cash_player_damage_hostage -30",
+                "cash_player_interact_with_hostage 0",
+                "cash_player_killed_enemy_default 0",
+                "cash_team_win_by_time_running_out_bomb 0",
+                "cash_player_killed_enemy_factor 0",
+                "cash_player_killed_hostage -1000",
+                "cash_player_killed_teammate -300",
+                "cash_player_rescued_hostage 0",
+                "cash_team_elimination_bomb_map 0",
+                "cash_team_elimination_hostage_map_t 0",
+                "cash_team_elimination_hostage_map_ct 0",
+                "cash_team_hostage_alive 0",
+                "cash_team_hostage_interaction 0",
+                "cash_team_loser_bonus 0",
+                "cash_team_bonus_shorthanded 0",
+                "cash_team_loser_bonus_consecutive_rounds 0",
+                "cash_team_planted_bomb_but_defused 0",
+                "cash_team_rescued_hostage 0",
+                "cash_team_terrorist_win_bomb 0",
+                "cash_team_win_by_defusing_bomb 0",
+                "cash_team_win_by_hostage_rescue 0",
+                "cash_team_win_by_time_running_out_hostage 0",
+                "mp_playercashawards 0",
+                "mp_teamcashawards 0",
+                "mp_startmoney 0",
+                "mp_maxmoney 0",
+                "mp_afterroundmoney 0"  
+            },
+            Teams = new List<string> 
+            {
+                //config teams behavior
+                "mp_limitteams 0",
+                "mp_autoteambalance false",
+                "mp_autokick 0",
+                "bot_quota_mode fill",
+                "bot_join_team ct",
+                "mp_ct_default_melee weapon_knife",
+                "mp_ct_default_secondary weapon_usp_silencer",
+                "mp_ct_default_primary",
+                "mp_t_default_melee weapon_knife",
+                "mp_t_default_secondary",
+                "mp_t_default_primary"
+            },
+            Movement = new List<string> 
+            {
+                "sv_enablebunnyhopping 1",
+                "sv_airaccelerate 99999",
+                "sv_wateraccelerate 50",
+                "sv_accelerate_use_weapon_speed 0",
+                "sv_maxspeed 9999",
+                "sv_alltalk 0",
+                "sv_stopspeed 0",
+                "sv_backspeed 0.1",
+                "sv_accelerate 50",
+                "sv_staminamax 0",
+                "sv_maxvelocity 9000",
+                "sv_staminajumpcost 0",
+                "sv_staminalandcost 0",
+                "sv_staminarecoveryrate 0"
+            },
+            RoundTimer = new List<string> 
+            {
+                //roundtimer cvars
+                "mp_roundtime 60",
+                "mp_roundtime_defuse 60",
+                "mp_roundtime_hostage 60"
+            },
+            PlayerClipping = new List<string> 
+            {
+                "mp_solid_teammates 2"
+            }
+        };
+            
+        File.WriteAllText(configPath, JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    
+    //reload config
+    public static void ReloadGameVarsConfig() { LoadGameVarsConfig(); }
+
+    private static void ExecGameVars()
+    {
+        ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.Teams, 6));
+        ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.Movement, 6));
+        
+        if (DeathrunManagerConfig.Config.RemoveMoneyFromGameAndHud is true)
+            ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.Cash, 6));
+        if (DeathrunManagerConfig.Config.SetRoundTimeOneHour is true)
+            ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.RoundTimer, 6));
+        if (DeathrunManagerConfig.Config.EnableClippingThroughTeamMates is true)
+            ExecuteGameVarsChunks(GetGameVarsChunks(GameVarsConfig.PlayerClipping, 6));
+    }
+
+    private static void ExecuteGameVarsChunks(IEnumerable<string> gameVarsChunks)
+    {
+        foreach (var gameVarsChunk in gameVarsChunks)
+        {
+            DeathrunManager.Bridge.ModSharp.ServerCommand(gameVarsChunk);
+            
+            Console.BackgroundColor = ConsoleColor.Magenta;
+            Console.WriteLine(gameVarsChunk);
+            Console.ResetColor();
+        }
+    }
+    
+    private static IEnumerable<string> GetGameVarsChunks(IReadOnlyList<string> commands, int chunkSize)
+    {
+        for (var i = 0; i < commands.Count; i += chunkSize)
+        {
+            var builder = new StringBuilder();
+            var end = Math.Min(i + chunkSize, commands.Count);
+
+            for (var j = i; j < end; j++)
+            {
+                if (j > i) builder.Append("; ");
+
+                builder.Append(commands[j]);
+            }
+            yield return builder.ToString();
+        }
+    }
+
+    #endregion
+    
     #region Listener's overrides
     
     int IClientListener.ListenerVersion => IClientListener.ApiVersion;
@@ -441,6 +456,14 @@ internal class GameplayManager(
     #endregion
 }
 
+public class DeathrunGameModeVarsConfig
+{
+    public List<string> Cash { get; init; } = [];
+    public List<string> Teams { get; init; } = [];
+    public List<string> Movement { get; init; } = [];
+    public List<string> RoundTimer { get; init; } = [];
+    public List<string> PlayerClipping { get; init; } = [];
+}
 
 
 
