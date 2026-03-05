@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using DeathrunManager.Config;
+using DeathrunManager.Extensions;
 using DeathrunManager.Interfaces.Managers.PlayersManager;
 using DeathrunManager.Shared;
 using DeathrunManager.Shared.Objects;
@@ -26,6 +27,11 @@ internal class PlayersManager(
     
     private static readonly ConcurrentDictionary<ulong, DeathrunPlayer> DeathrunPlayers = new();
     
+    /// <summary>
+    /// Immutable deathrun players list that is ideal for use in the game loop or other places called every game tick.
+    /// </summary>
+    private static readonly StorageExtension.ImmutableStorage<DeathrunPlayer> ImmutableDeathrunPlayers = new();
+
     #region IModule
     
     public bool Init()
@@ -60,11 +66,11 @@ internal class PlayersManager(
 
     #region Hooks
 
-    private void OnGameFramePost(bool simulating, bool bFirstTick, bool bLastTick)
+    private static void OnGameFramePost(bool simulating, bool bFirstTick, bool bLastTick)
     {
-        foreach (var iDeathrunPlayer in GetAllValidDeathrunPlayers())
+        foreach (var deathrunPlayer in ImmutableDeathrunPlayers.Items)
         {
-            if (iDeathrunPlayer is DeathrunPlayer { } deathrunPlayer)
+            if (deathrunPlayer.IsValid is true)
             {
                 //skip bots here
                 if (deathrunPlayer.Client.SteamId == 0) continue;
@@ -82,19 +88,22 @@ internal class PlayersManager(
     public void OnClientConnected(IGameClient client)
     {
         if (client?.IsValid is not true) return;
-
-        //skip if we couldn't add the client to the deathrun players dictionary
-        DeathrunPlayers.TryAdd(client.SteamId != 0 ? client.SteamId : client.Slot,
-                                                          new DeathrunPlayer(client));
         
-        var deathrunPlayer = DeathrunPlayers.GetValueOrDefault(client.SteamId != 0 ? client.SteamId : client.Slot);
+        //skip if we couldn't add the client to the deathrun players dictionary
+        DeathrunPlayer? deathrunPlayer;
+        if (DeathrunPlayers.TryAdd(client.SteamId != 0 ? client.SteamId : client.Slot,
+                                 deathrunPlayer = new DeathrunPlayer(client)) is not true)
+                                                                                   return;
+        
         if (deathrunPlayer?.LivesSystem is null) return;
+        
+        //add the deathrun player to the immutable deathrun players list
+        ImmutableDeathrunPlayers.Add(deathrunPlayer);
         
         //skip getting data from the database if we've set the SaveLivesToDatabase to false
         if (LivesSystemManager.LivesSystemManager.LivesSystemConfig?.SaveLivesToDatabase is not true)
         {
             deathrunPlayer.LivesSystem?.SetLivesNum(LivesSystemManager.LivesSystemManager.LivesSystemConfig?.StartLivesNum ?? 1);
-            return;
         }
         else
         {
@@ -121,6 +130,9 @@ internal class PlayersManager(
 
         if (DeathrunPlayers.TryRemove(client.SteamId != 0 ? client.SteamId : client.Slot, out var removedDeathrunPlayer) is true)
         {
+            //remove the player from the immutable deathrun players list
+            ImmutableDeathrunPlayers.Remove(removedDeathrunPlayer);
+            
             //skip bots here
             if (client.SteamId == 0) return;
             
@@ -266,7 +278,7 @@ internal class PlayersManager(
 
     #endregion
     
-    #region DeathrunPlayer Shared
+    #region DeathrunPlayers Shared
 
     public IDeathrunPlayer? GetDeathrunPlayer(IGameClient client)
     {
