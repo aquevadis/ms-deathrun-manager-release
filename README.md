@@ -64,6 +64,8 @@ The configurations values do exactly what they are labeled, so I believe it does
 ### Shared API - [Mini documentation](https://github.com/aquevadis/ms-deathrun-manager-release/blob/main/src/DeathrunManager.Shared/README.md)
 - The plugin focuses more on the API it provides, that you can use to create and plug-in all kinds of addons and features.
 
+#### Be sure to also check the ModSharp's documentation about Shared APIs [here](https://docs.modsharp.net/docs/en-us/examples/module-api.html).
+
 #### Getting started
 ##### 1. First download the Nuget package. You can also visit the package's page [**here**](https://www.nuget.org/packages/DeathrunManager.Shared/0.1.3).
 ```csharp
