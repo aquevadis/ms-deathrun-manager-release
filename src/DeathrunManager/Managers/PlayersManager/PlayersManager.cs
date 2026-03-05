@@ -63,9 +63,12 @@ internal class PlayersManager(
     private void OnGameFramePost(bool simulating, bool bFirstTick, bool bLastTick)
     {
         //logger.LogInformation("[MS-ZP] OnGameFramePre");
-        foreach (var deathrunPlayer in GetAllValidDeathrunPlayers().ToList())
+        foreach (var iDeathrunPlayer in GetAllValidDeathrunPlayers().ToList())
         {
-            deathrunPlayer.PlayerThink();
+            if (iDeathrunPlayer is DeathrunPlayer { } deathrunPlayer)
+            {
+                deathrunPlayer.PlayerThink();
+            }
         }
     }
 

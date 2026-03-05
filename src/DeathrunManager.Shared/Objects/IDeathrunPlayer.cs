@@ -104,18 +104,4 @@ public interface IDeathrunPlayer
     void SetCenterMenuBottomRowHtml(string? htmlString);
 
     #endregion
-
-    #region DeathrunPlayer Thinkers
-
-    /// <summary>
-    /// Performs periodic logic processing for the player entity.
-    /// This method updates the player's center menu display by setting the top, middle,
-    /// and bottom rows with relevant data and formatting them into HTML content.
-    /// If a lives system is attached to the player, its HTML string representation of the
-    /// lives counter is displayed on the bottom row. Finally, the constructed HTML content
-    /// is rendered to the player's center screen.
-    /// </summary>
-    void PlayerThink();
-
-    #endregion
 }
