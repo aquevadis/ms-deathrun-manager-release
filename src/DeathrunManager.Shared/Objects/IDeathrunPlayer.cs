@@ -34,8 +34,14 @@ public interface IDeathrunPlayer
     /// </summary>
     DPlayerClass Class { get; set; }
 
+    /// <summary>
+    /// Initializes the lives system for the player.
+    /// This method creates a new instance of the lives system associated with the player
+    /// and ensures that it is properly set up and functional for use during gameplay.
+    /// </summary>
+    /// <returns>Returns true if the lives system is successfully initialized; otherwise, false.</returns>
     bool InitLivesSystem();
-    
+
     /// <summary>
     /// Represents the lives management system associated with the player in the Deathrun context.
     /// This property provides access to functionality that allows tracking and modification of the
@@ -95,13 +101,6 @@ public interface IDeathrunPlayer
     /// </summary>
     /// <param name="htmlString">The HTML string to set for the middle row. Can be null to clear the content.</param>
     void SetCenterMenuMiddleRowHtml(string? htmlString);
-
-    /// <summary>
-    /// Sets the HTML content for the bottom row of the center menu.
-    /// This content is displayed to the player as part of the UI.
-    /// </summary>
-    /// <param name="htmlString">The HTML string to set for the bottom row. Can be null to clear the content.</param>
-    void SetCenterMenuBottomRowHtml(string? htmlString);
 
     #endregion
 }
