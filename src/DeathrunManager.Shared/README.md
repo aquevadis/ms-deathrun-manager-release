@@ -248,24 +248,9 @@ Prevents player from being selected in next rotation.
 ```csharp
 void SetCenterMenuTopRowHtml(string? htmlString);
 void SetCenterMenuMiddleRowHtml(string? htmlString);
-void SetCenterMenuBottomRowHtml(string? htmlString);
 ```
 
 Passing `null` clears the row.
-
----
-
-## Thinker
-
-```csharp
-void PlayerThink();
-```
-
-Responsible for:
-
-- Rendering UI
-- Updating lives counter
-- Per-player periodic logic
 
 ---
 
