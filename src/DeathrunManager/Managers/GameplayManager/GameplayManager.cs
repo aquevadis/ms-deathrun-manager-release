@@ -311,7 +311,6 @@ internal class GameplayManager(
         DeathrunManager.Logger.LogInformation("[DeathrunManager] {colorMessage}", "Load DeathrunManager Config!");
         GameVarsConfig = config;
     }
-
     private static void CreateGameVarsConfig(string configPath)
     {
         var config = new DeathrunGameModeVarsConfig
@@ -396,8 +395,6 @@ internal class GameplayManager(
             
         File.WriteAllText(configPath, JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true }));
     }
-    
-    //reload config
     public static void ReloadGameVarsConfig() { LoadGameVarsConfig(); }
 
     private static void ExecGameVars()
@@ -418,10 +415,6 @@ internal class GameplayManager(
         foreach (var gameVarsChunk in gameVarsChunks)
         {
             DeathrunManager.Bridge.ModSharp.ServerCommand(gameVarsChunk);
-            
-            Console.BackgroundColor = ConsoleColor.Magenta;
-            Console.WriteLine(gameVarsChunk);
-            Console.ResetColor();
         }
     }
     
