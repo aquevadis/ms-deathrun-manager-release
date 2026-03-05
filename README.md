@@ -69,7 +69,7 @@ The configurations values do exactly what they are labeled, so I believe it does
 #### Getting started
 ##### 1. First download the Nuget package. You can also visit the package's page [**here**](https://www.nuget.org/packages/DeathrunManager.Shared/0.1.3).
 ```csharp
-dotnet add package DeathrunManager.Shared --version 0.1.3
+dotnet add package DeathrunManager.Shared
 ```
 
 
