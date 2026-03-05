@@ -11,13 +11,16 @@ namespace DeathrunManager.Managers.GameplayManager;
 public class LivesSystem(IDeathrunPlayer deathrunPlayer) : ILivesSystem
 {
     public IDeathrunPlayer? Owner { get; } = deathrunPlayer;
-
-    private int LivesNum { get; set; } = 0;
     
+    private int LivesNum { get; set; } = 0;
     public int GetLivesNum => LivesNum;
+    
     public void SetLivesNum(int amount) => LivesNum = amount;
+    
     public void AddLivesNum(int amount) => LivesNum += amount;
+    
     public void RemoveLife() => LivesNum -= LivesNum >= 1 ? 1 : 0;
+    
     public void RemoveLives(int amount = 0, bool allLives = false)
     {
         if (amount is 0 && allLives is not true)
@@ -89,9 +92,9 @@ public class LivesSystem(IDeathrunPlayer deathrunPlayer) : ILivesSystem
         return false;
     }
     
-    public string GetLivesCounterHtmlString()
+    public string? GetLivesCounterHtmlString()
     {
-        if (LivesSystemManager.LivesSystemManager.LivesSystemConfig?.ShowLivesCounter is not true) return "";
+        if (LivesSystemManager.LivesSystemManager.LivesSystemConfig?.ShowLivesCounter is not true) return null;
             
         return $"<font class='fontSize-m stratum-font fontWeight-Bold' color='#A7A7A7'>Extra Lives: </font>"
                + $"<font class='fontSize-m stratum-font fontWeight-Bold' color='orange'>{Owner?.LivesSystem?.GetLivesNum}</font>";

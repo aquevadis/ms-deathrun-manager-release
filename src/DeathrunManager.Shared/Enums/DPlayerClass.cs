@@ -1,5 +1,9 @@
 namespace DeathrunManager.Shared.Enums;
 
+/// <summary>
+/// Represents the classification of a player in the game.
+/// The classification determines the role and behavior of the player within the game's mechanics.
+/// </summary>
 public enum DPlayerClass
 {
     /// <summary>

@@ -9,13 +9,11 @@ public interface ILivesSystem
     IDeathrunPlayer? Owner { get; }
 
     /// <summary>
-    /// Gets or sets the number of lives remaining for the player during the Deathrun game session.
-    /// This property determines how many respawns the player has left before being permanently eliminated from the game.
+    /// Gets the current number of extra lives assigned to the player in the life system.
+    /// This property provides a read-only integer value representing the player's remaining lives.
     /// </summary>
-    //int LivesNum { get; }
-
     int GetLivesNum { get; }
-    
+
     /// <summary>
     /// Sets the number of lives for the player to the specified amount.
     /// This method directly updates the player's lives count, overriding the current value.

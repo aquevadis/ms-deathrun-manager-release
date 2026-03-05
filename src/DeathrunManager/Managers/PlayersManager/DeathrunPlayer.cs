@@ -170,7 +170,7 @@ public class DeathrunPlayer : IDeathrunPlayer
     #endregion
     
     #region DeathrunPlayer Thinkers
-
+    
     private void StartPlayerThink()
     {
         IsThinking = true;
@@ -189,10 +189,6 @@ public class DeathrunPlayer : IDeathrunPlayer
     {
         if (IsThinking is not true) return;
         
-        //set data to components if any was passed
-        SetCenterMenuTopRowHtml(null);
-        SetCenterMenuMiddleRowHtml(null);
-            
         if (LivesSystem is not null)
             SetCenterMenuBottomRowHtml(LivesSystem.GetLivesCounterHtmlString());
             
@@ -208,14 +204,14 @@ public class DeathrunPlayer : IDeathrunPlayer
     
     #region Html Center Menu
     
-    private string? _topRowHtml = "";
-    private string? _middleRowHtml = "";
-    private string? _bottomRowHtml = "";
+    private string? _topRowHtml;
+    private string? _middleRowHtml;
+    private string? _bottomRowHtml;
     
     public void SetCenterMenuTopRowHtml(string? htmlString) => _topRowHtml = htmlString;
-    
     public void SetCenterMenuMiddleRowHtml(string? htmlString) => _middleRowHtml = htmlString;
     
+    //reserved for lives counter
     public void SetCenterMenuBottomRowHtml(string? htmlString) => _bottomRowHtml = htmlString;
     
     #endregion
