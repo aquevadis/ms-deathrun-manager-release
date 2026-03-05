@@ -62,7 +62,7 @@ internal class PlayersManager(
 
     private void OnGameFramePost(bool simulating, bool bFirstTick, bool bLastTick)
     {
-        foreach (var iDeathrunPlayer in GetAllValidDeathrunPlayers().ToList())
+        foreach (var iDeathrunPlayer in GetAllValidDeathrunPlayers())
         {
             if (iDeathrunPlayer is DeathrunPlayer { } deathrunPlayer)
             {
