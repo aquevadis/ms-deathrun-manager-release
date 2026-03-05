@@ -18,7 +18,7 @@ public class DeathrunPlayer : IDeathrunPlayer
     {
         Client = client;
         
-        //skip initialization of the lives system if we've disabled the system
+        //try initializating the lives system if we've enabled it in the config
         if (LivesSystemManager.LivesSystemManager.LivesSystemConfig?.EnableLivesSystem is true)
         {
             if (InitLivesSystem() is not true)
