@@ -62,11 +62,14 @@ internal class PlayersManager(
 
     private void OnGameFramePost(bool simulating, bool bFirstTick, bool bLastTick)
     {
-        //logger.LogInformation("[MS-ZP] OnGameFramePre");
         foreach (var iDeathrunPlayer in GetAllValidDeathrunPlayers().ToList())
         {
             if (iDeathrunPlayer is DeathrunPlayer { } deathrunPlayer)
             {
+                //skip bots here
+                if (deathrunPlayer.Client.SteamId == 0) continue;
+                
+                //call the player think method
                 deathrunPlayer.PlayerThink();
             }
         }
@@ -131,6 +134,9 @@ internal class PlayersManager(
                 var livesNum = removedDeathrunPlayer.LivesSystem.GetLivesNum;
                 
                 Task.Run(() => SaveLivesToDatabase(steamId64, livesNum));
+
+                //remove thinking functions
+                removedDeathrunPlayer.StopPlayerThink();
             }
         }
     }

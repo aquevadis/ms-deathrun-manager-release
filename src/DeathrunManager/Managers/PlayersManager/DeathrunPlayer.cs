@@ -18,6 +18,8 @@ public class DeathrunPlayer : IDeathrunPlayer
     {
         Client = client;
         
+        StartPlayerThink();
+        
         //try initializing the lives system if we've enabled it in the config
         if (LivesSystemManager.LivesSystemManager.LivesSystemConfig?.EnableLivesSystem is true)
         {
@@ -43,6 +45,7 @@ public class DeathrunPlayer : IDeathrunPlayer
     public bool IsValid => Controller?.IsValidEntity is true && PlayerPawn?.IsValidEntity is true && Controller.IsConnected() is true;
     public bool IsValidAndAlive => IsValid is true && PlayerPawn?.IsAlive is true;
     public bool SkipNextGameMasterPickUp { get; set; } = false;
+    private bool IsThinking { get; set; } = true;
     
     #endregion
     
@@ -167,9 +170,25 @@ public class DeathrunPlayer : IDeathrunPlayer
     #endregion
     
     #region DeathrunPlayer Thinkers
+
+    private void StartPlayerThink()
+    {
+        IsThinking = true;
+    }
+    
+    public void StopPlayerThink()
+    {
+        SetCenterMenuTopRowHtml(null);
+        SetCenterMenuMiddleRowHtml(null);
+        SetCenterMenuBottomRowHtml(null);
+        
+        IsThinking = false;
+    }
     
     public void PlayerThink()
     {
+        if (IsThinking is not true) return;
+        
         //set data to components if any was passed
         SetCenterMenuTopRowHtml(null);
         SetCenterMenuMiddleRowHtml(null);
@@ -177,21 +196,12 @@ public class DeathrunPlayer : IDeathrunPlayer
         if (LivesSystem is not null)
             SetCenterMenuBottomRowHtml(LivesSystem.GetLivesCounterHtmlString());
             
-        this.PrintToCenterHtml(  (_topRowHtml is not null      ? _topRowHtml    + "<br/>" : "") 
-                                 + (_middleRowHtml is not null   ? _middleRowHtml + "<br/>" : "") 
-                                 + _bottomRowHtml
+        this.PrintToCenterHtml
+        (
+        (   _topRowHtml is not null        ? _topRowHtml          + "<br/>" : "") 
+                 + (_middleRowHtml is not null     ? _middleRowHtml       + "<br/>" : "") 
+                 + _bottomRowHtml
         );
-        
-        //DeathrunManager.Logger.LogInformation("[DeathrunPlayer][PlayerThink] Player {0} is thinking!", Client.SteamId);
-
-    }
-    
-    public void StopPlayerThink()
-    {
-        
-        SetCenterMenuTopRowHtml(null);
-        SetCenterMenuMiddleRowHtml(null);
-        SetCenterMenuBottomRowHtml(null);
     }
     
     #endregion
