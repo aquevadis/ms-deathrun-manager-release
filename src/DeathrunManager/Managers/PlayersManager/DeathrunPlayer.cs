@@ -204,9 +204,9 @@ public class DeathrunPlayer : IDeathrunPlayer
     
     #region Html Center Menu
     
-    private string? _topRowHtml = "";
-    private string? _middleRowHtml = "";
-    private string? _bottomRowHtml = "";
+    private string? _topRowHtml;
+    private string? _middleRowHtml;
+    private string? _bottomRowHtml;
     
     public void SetCenterMenuTopRowHtml(string? htmlString) => _topRowHtml = htmlString;
     public void SetCenterMenuMiddleRowHtml(string? htmlString) => _middleRowHtml = htmlString;
