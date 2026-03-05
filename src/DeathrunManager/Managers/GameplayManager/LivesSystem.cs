@@ -11,13 +11,16 @@ namespace DeathrunManager.Managers.GameplayManager;
 public class LivesSystem(IDeathrunPlayer deathrunPlayer) : ILivesSystem
 {
     public IDeathrunPlayer? Owner { get; } = deathrunPlayer;
-
-    private int LivesNum { get; set; } = 0;
     
+    private int LivesNum { get; set; } = 0;
     public int GetLivesNum => LivesNum;
+    
     public void SetLivesNum(int amount) => LivesNum = amount;
+    
     public void AddLivesNum(int amount) => LivesNum += amount;
+    
     public void RemoveLife() => LivesNum -= LivesNum >= 1 ? 1 : 0;
+    
     public void RemoveLives(int amount = 0, bool allLives = false)
     {
         if (amount is 0 && allLives is not true)
