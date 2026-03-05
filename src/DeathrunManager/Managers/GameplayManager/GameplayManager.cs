@@ -226,7 +226,7 @@ internal class GameplayManager(
                          + "mp_autokick 0;"
                     );
                 
-                //remove money from the game and hud 6/6
+                //speed/acceleration related cvars 1/3
                 sharedSystem.GetModSharp()
                     .ServerCommand
                     (
@@ -236,10 +236,34 @@ internal class GameplayManager(
                         + "sv_backspeed 0.1;"
                         + "sv_accelerate 10;"
                         + "sv_wateraccelerate 10;"
-                        + "sv_accelerate_use_weapon_speed false;"
+                        + "sv_accelerate_use_weapon_speed 0;"
+                    );
+                //speed/acceleration related cvars 2/3
+                sharedSystem.GetModSharp()
+                    .ServerCommand
+                    (
+                        "sv_maxspeed 9999;"
+                        + "sv_alltalk 0;"
+                        + "sv_stopspeed 0;"
+                        + "sv_backspeed 0.1;"
+                        + "sv_accelerate 10;"
+                        + "sv_wateraccelerate 10;"
+                        + "sv_staminamax 0;"
+                    );
+                //speed/acceleration related cvars 3/3
+                sharedSystem.GetModSharp()
+                    .ServerCommand
+                    (
+                        "sv_maxvelocity 9000;"
+                        + "sv_staminajumpcost 0;"
+                        + "sv_staminalandcost 0;"
+                        + "sv_staminarecoveryrate 0;"
+                        // + ";"
+                        // + ";"
+                        // + ";"
                     );
             }
-
+            
             //adjust round time to 1 hour
             if (DeathrunManagerConfig.Config.SetRoundTimeOneHour is true)
             {
